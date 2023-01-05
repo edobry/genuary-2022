@@ -16,7 +16,9 @@ const s = (p) => {
     const minTextSize = 10;
     let textSize = minTextSize - 1;
     const timer = 600;
+    let increment = 5;
     const rate = 0;
+    const renderBoxes = false;
 
     // const rowSize = 13;
     // const colSize = 30;
@@ -26,7 +28,7 @@ const s = (p) => {
 
     let s = 0;
 
-    const padding = 5;
+    let padding = 5;
 
     let height;
     let width;
@@ -38,8 +40,9 @@ const s = (p) => {
     let availableBoxes;
     let surplus;
 
-    const calcMax = (textSize) => {
+    const calcMax = textSize => {
         p.textSize(textSize);
+        padding = Math.floor(textSize / 4)
         height = textSize + padding * 2;
         width = p.textWidth("00:00") + padding * 2;
 
@@ -47,7 +50,7 @@ const s = (p) => {
         maxRows = Math.floor(canvasSize / height);
 
         availableBoxes = maxCols * maxRows;
-        surplus = availableBoxes - timer;
+        surplus = (availableBoxes - 1) - Math.ceil(timer / increment);
     };
 
     p.setup = function () {
@@ -79,8 +82,10 @@ const s = (p) => {
         const x = col * width;
         const y = row * height;
 
-        p.noFill();
-        p.rect(x, y, width, height);
+        if (renderBoxes) {
+            p.noFill();
+            p.rect(x, y, width, height);
+        }
         p.fill(0, 0, 0);
         p.text(`${pad(mins)}:${pad(secs)}`, x + padding, y + padding);
 
@@ -89,7 +94,7 @@ const s = (p) => {
             col++;
         } else row++;
         if (col < maxCols && s < timer) {
-            s++;
+            s += increment;
             wait(rate).then(() => p.redraw());
         }
     };
